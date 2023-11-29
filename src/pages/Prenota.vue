@@ -20,6 +20,34 @@
         }
     },
     methods:{
+      sottrazione(id){
+        console.log(id)
+        this.arrProduct.forEach(element => {
+          if(element.id == id && element.counter > 0){
+            
+            console.log(element.counter)
+            element.counter = parseInt(element.counter)  - 1
+            
+            
+          }
+          
+        });
+      },
+      addizione(id){
+        console.log(id)
+        this.arrProduct.forEach(element => {
+          if(element.id == id){
+            
+            console.log(element.counter)
+            element.counter = parseInt(element.counter)  + 1
+            
+            
+          }
+          
+        });
+      },
+      
+
       cartopen(){
         if (this.cartinput){
           this.cartinput = 0
@@ -95,106 +123,12 @@
           state.sideCartValue=1
         }
       },
-      sendOrder(){
-        let data = {
-          name:this.name,
-          phone:this.phone,
-          time:this.time,
-          arrId:this.state.arrId,
-          arrQt:this.state.arrQt,
-          
-        };
-        axios.post(state.baseUrl + 'api/orders', {data}).then(response=>(response))
-      },
-      newItem(title, counter, tprice, price) {
-        let newitem={
-          title,
-          counter,
-          totprice: tprice,
-          price: parseInt(price),
-        }
-        return newitem;
-      },
-      addItem(title, counter, price, id){
-        if(counter<=0){
-          return console.log('ci hai provato amico!')
-        }
-        let check= false;
-        let newitem= this.newItem(title, counter, price*counter, price);
-        console.log(newitem);
-        this.state.arrCart.forEach((element, index) => {
-          if(element.title == title){
-            element.counter += counter
-            element.totprice = element.counter * element.price
-            check=true
-            this.state.arrQt[index] += counter
-          }
 
-        });
-      
-        if(!check){
-          this.state.arrCart.push(newitem);
-          this.state.arrId.push(id)
-          this.state.arrQt.push(counter)
-        }
-        this.arrProduct.forEach(element => {
-          if(element.name == title){
-            element.counter = 0
-          }
-        });
-        this.getTot();
-      },
-      removeItem(title){
-        this.state.arrCart.forEach((element, i) => {
-          if(element.title== title){
-            if(element.counter>=0){
-            element.counter --;
-            element.totprice -= element.price
-            this.state.arrQt[i]--;
-            }if(element.counter == 0){
-              let nwi = i - 1;
-              this.state.arrId.splice(i, 1)
-              this.state.arrQt.splice(i, 1)
-              let newarrCart = this.state.arrCart.filter((element) => {
-                return element.title !== title;
-              });
-              this.state.arrCart=[];
-              this.state.arrCart = newarrCart;
-              }
-          }
-        });
-
-        this.getTot();
-
-      },
-      upCounter(id){
-        this.arrProduct.forEach(element => {
-          if(element.id == id){
-            element.counter ++
-          }
-        });
-
-      },
-      downCounter(id){
-        this.arrProduct.forEach(element => {
-          if(element.id == id){
-            if(element.counter>=1){
-              element.counter --
-            }
-          }
-        });
-      },
-      getTot(){
-        this.state.totCart = 0
-        this.state.arrCart.forEach(element => {
-          console.log(element.totprice)
-          this.state.totCart = this.state.totCart + element.totprice
-        });
-      }
     },
     created(){
       this.getProduct(0);
       this.getCategory();
+      console.log('thomas')
 
      
       this.state.actvPage = 5;
@@ -221,7 +155,7 @@
             </div>
           <div class="categorie"   :class="catinput ? '': 'cat-off'">
             <div v-for="cat in arrCategory" :key="cat.id" class="category" :class="actvcat == cat.id ? 'category-on' : '' " @click="changeCategory(cat.id)"> 
-              <span @click="catopen(catinput)" :class="actvcat == cat.id ? 'span-on' : '' ">{{ cat.name }}</span>
+              <span @click="catopen(catinput)" :class="actvcat == cat.id ? 'span-on' : ''">{{ cat.name }}</span>
             </div>
           </div>
           <div class="cart-close" @click="cartopen(cartinput)" :class="cartinput ?  'cat-off': ''">
@@ -236,10 +170,8 @@
             <div :class="state.sideCartValue ? 'content-cart' : 'ccoff'" >
               <div class="span" v-if="!state.arrCart.length && !state.sideCartValue">Il carrello è vuoto</div>
               <div v-for="item in state.arrCart" :class="state.sideCartValue ?  'item-off' : 'item-on'" :key="item.id">
-                <div>{{ item.title }}</div>
-                <div>{{ getPrice(item.totprice) }}</div>
-                <div>x {{ item.counter }}</div>
-                <svg :class="state.sideCartValue ?  'sub-item-off' : 'sub-item-on'" @click="removeItem(item.title)"  style="color: white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="current-color" class="bi bi-trash" viewBox="0 0 16 16"> <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" fill="white"></path> <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" fill="white"></path> </svg>
+                
+                <svg :class="state.sideCartValue ?  'sub-item-off' : 'sub-item-on'"  style="color: white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="current-color" class="bi bi-trash" viewBox="0 0 16 16"> <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" fill="white"></path> <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" fill="white"></path> </svg>
               </div>
               <div class="bottom-cart">
                 <router-link :to="{ name: 'conferma' }" v-if="state.arrCart.length && cartinput" class="next">Completa ordine</router-link>
@@ -258,22 +190,26 @@
 
         <div class="card-wrap"  v-for="item in arrProduct" :key="item.id">
           <div class="card">
-            <div class="title">{{ item.name }}</div>
-          <img src="../assets/img/imgsushi.png" alt="">
-          <div class="c-tp">
-            <div class="tags"> <span>{{fixtag(item.tags) }}</span></div>
-            <div class="price">{{ getPrice(item.price) }}</div>
-            <div class="add">
-              <div class="sec">
-                <span class="minus"  @click="downCounter(item.id)">-</span>
-                <span class="counter">{{ item.counter }}</span>
-                <span class="plus" @click="upCounter(item.id)" >+</span>
-                <div class="mybtn" @click="addItem(item.name, item.counter, item.price, item.id)">aggiungi</div>
+                <div class="title">{{ item.name }}</div>
+              <img src="../assets/img/imgsushi.png" alt="">
+              <div class="c-tp">
+              <div class="tags"> <span>{{fixtag(item.tags) }}</span></div>
+              <div class="price">{{ getPrice(item.price) }}</div>
+              <div class="add">
+               <div class="sec">
+
+                 <div class="meno" @click="sottrazione(item.id)">-</div>
+                 <div class="counter">{{item.counter }}</div>
+                 <div class="più" @click="addizione(item.id)">+</div>
+                 <div class="aggiungi">aggiungi</div>
+               </div>
+                
+                
+              </div>
             </div>
           </div>
-          </div>
         </div>
-        </div>
+        
       
   
       </div>
@@ -413,7 +349,7 @@
 
           .add{
           position: absolute;
-          //background-color: red;
+          
           top: 60px;
           left: 0;
           width: 100%;
